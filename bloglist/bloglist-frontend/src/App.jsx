@@ -6,32 +6,40 @@ import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
-
-const localStorageKey = "loggedNoteappUser";
+import { setNotification } from "./reducers/notificationReducer";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createBlog,
+  deleteBlog,
+  likeBlog,
+  setBlogs,
+} from "./reducers/blogReducer";
+import {
+  initializeUser,
+  localStorageKey,
+  loginUser,
+  logoutUser,
+} from "./reducers/userReducer";
 
 const App = () => {
-  const baseNotification = {
-    message: null,
-    variant: "error",
-  };
-
-  const [blogs, setBlogs] = useState([]);
+  const dispatch = useDispatch();
+  const notification = useSelector((state) => state.notification);
+  const user = useSelector((state) => state.user);
+  const blogs = useSelector((state) =>
+    [...state.blogs].sort((a, b) => b.likes - a.likes)
+  );
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
-  const [notification, setNotification] = useState(baseNotification);
-  const noteFormRef = useRef();
+  const blogFormRef = useRef();
 
-  const showNotification = (data) => {
-    setNotification({ ...notification, ...data });
-    setTimeout(() => setNotification(baseNotification), 5000);
+  const showNotification = (notification, time) => {
+    dispatch(setNotification(notification, time));
   };
 
   const handleError = (err) => {
-    const message = err?.response?.data?.error;
+    const message = err?.response?.data?.error ?? "Internal Server Error";
     const code = err?.response?.status;
     showNotification({ message });
-    console.log(err);
     if (code === 401) return handleLogout();
   };
 
@@ -40,26 +48,23 @@ const App = () => {
 
     try {
       const user = await loginService.login({ username, password });
-      setUser(user);
-      blogService.setToken(user.token);
-      localStorage.setItem(localStorageKey, JSON.stringify(user));
+      dispatch(loginUser(user));
       setUsername("");
       setPassword("");
-    } catch {
-      showNotification({ message: "wrong credentials" });
+    } catch (err) {
+      showNotification({
+        message: err?.response?.data?.error ?? "wrong credentials",
+      });
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem(localStorageKey);
-    setUser(null);
-  };
+  const handleLogout = () => dispatch(logoutUser(null));
 
   const handleAddBlog = async (blog) => {
     try {
       const returnedBlog = await blogService.create(blog);
-      setBlogs(blogs.concat(returnedBlog));
-      noteFormRef.current?.toggleVisibility();
+      dispatch(createBlog(returnedBlog));
+      blogFormRef.current?.toggleVisibility();
     } catch (err) {
       handleError(err);
     }
@@ -68,7 +73,7 @@ const App = () => {
   const handleLikeBlog = async (id, blog) => {
     try {
       const returnedBlog = await blogService.update(id, blog);
-      setBlogs(blogs.map((item) => (item.id === id ? returnedBlog : item)));
+      dispatch(likeBlog(returnedBlog));
     } catch (err) {
       handleError(err);
     }
@@ -80,22 +85,21 @@ const App = () => {
 
     try {
       await blogService.deleteBlog(blog.id);
-      setBlogs(blogs.filter((item) => item.id !== blog.id));
+      dispatch(deleteBlog(blog.id));
     } catch (err) {
       handleError(err);
     }
   };
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((blogs) => dispatch(setBlogs(blogs)));
   }, []);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem(localStorageKey);
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
+      dispatch(initializeUser(user));
     }
   }, []);
 
@@ -124,23 +128,21 @@ const App = () => {
             {user.name} logged in{" "}
             <button onClick={handleLogout}>Log out </button>
           </p>{" "}
-          <Togglable buttonLabel="Create new blog" ref={noteFormRef}>
+          <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
             <BlogForm handleAddBlog={handleAddBlog} />
           </Togglable>
         </div>
       )}
       <br />
-      {blogs
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={handleLikeBlog}
-            handleDeleteBlog={handleDeleteBlog}
-            isDeleteAllowed={blog.user?.username === user?.username}
-          />
-        ))}
+      {blogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          likeBlog={handleLikeBlog}
+          handleDeleteBlog={handleDeleteBlog}
+          isDeleteAllowed={blog.user?.username === user?.username}
+        />
+      ))}
     </div>
   );
 };
