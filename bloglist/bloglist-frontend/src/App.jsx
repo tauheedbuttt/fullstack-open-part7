@@ -5,12 +5,14 @@ import User from "./User";
 import Users from "./Users";
 import Blogs from "./Blogs";
 import Blog from "./components/Blog";
+import Navigation from "./components/Navigation";
 
 const App = () => {
   return (
     <div>
       <h2>BLOGS</h2>
       <Notification />
+      <Navigation />
       <Login />
       <Routes>
         <Route path="/blogs" element={<Blogs />} />
