@@ -35,4 +35,8 @@ const update = (id, blog) => {
   return request.then((response) => response.data);
 };
 
-export default { getAll, create, setToken, update, deleteBlog };
+const getOne = (id) => {
+  const request = axios.get(`${baseUrl}/${id}`);
+  return request.then((response) => response.data);
+};
+export default { getAll, create, setToken, update, deleteBlog, getOne };

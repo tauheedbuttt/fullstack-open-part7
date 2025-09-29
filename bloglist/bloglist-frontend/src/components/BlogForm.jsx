@@ -1,11 +1,18 @@
 import { useState } from "react";
+import blogService from "../services/blogs";
+import { createBlog } from "../reducers/blogReducer";
+import { setNotification } from "../reducers/notificationReducer";
+import { logoutUser } from "../reducers/userReducer";
+import { useDispatch } from "react-redux";
+
 const baseBlogState = {
   title: "",
   url: "",
   author: "",
 };
 
-const BlogForm = ({ handleAddBlog }) => {
+const BlogForm = () => {
+  const dispatch = useDispatch();
   const [blog, setBlog] = useState(baseBlogState);
 
   const handleChange = (e) => {
@@ -13,6 +20,25 @@ const BlogForm = ({ handleAddBlog }) => {
       ...blog,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const showNotification = (notification, time) => {
+    dispatch(setNotification(notification, time));
+  };
+  const handleError = (err) => {
+    const message = err?.response?.data?.error ?? "Internal Server Error";
+    const code = err?.response?.status;
+    showNotification({ message });
+    if (code === 401) return dispatch(logoutUser(null));
+  };
+
+  const handleAddBlog = async (blog) => {
+    try {
+      const returnedBlog = await blogService.create(blog);
+      dispatch(createBlog(returnedBlog));
+    } catch (err) {
+      handleError(err);
+    }
   };
 
   const onSubmit = (event) => {
