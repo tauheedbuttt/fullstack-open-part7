@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  BrowserRouter,
-  Link,
-  Route,
-  Routes,
-  useMatch,
-  useNavigate,
-} from "react-router-dom";
+import { Link, Route, Routes, useMatch, useNavigate } from "react-router-dom";
 import { useField } from ".";
 
 const Menu = () => {
@@ -47,13 +40,13 @@ const About = () => (
     <p>According to Wikipedia:</p>
 
     <em>
-      An anecdote is a brief, revealing account of an individual person or an
+      {`An anecdote is a brief, revealing account of an individual person or an
       incident. Occasionally humorous, anecdotes differ from jokes because their
       primary purpose is not simply to provoke laughter but to reveal a truth
       more general than the brief tale itself, such as to characterize a person
       by delineating a specific quirk or trait, to communicate an abstract idea
       about a person, place, or thing through the concrete details of a short
-      narrative. An anecdote is "a story with a point."
+      narrative. An anecdote is "a story with a point."`}
     </em>
 
     <p>
@@ -166,17 +159,6 @@ const App = () => {
   };
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
-
-  const vote = (id) => {
-    const anecdote = anecdoteById(id);
-
-    const voted = {
-      ...anecdote,
-      votes: anecdote.votes + 1,
-    };
-
-    setAnecdotes(anecdotes.map((a) => (a.id === id ? voted : a)));
-  };
 
   const match = useMatch("/anecdotes/:id");
   const anecdote = match ? anecdoteById(Number(match.params.id)) : null;
