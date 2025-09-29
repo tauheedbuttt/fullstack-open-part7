@@ -20,6 +20,9 @@ import {
   loginUser,
   logoutUser,
 } from "./reducers/userReducer";
+import { Route, Routes } from "react-router";
+import Users from "./Users";
+import User from "./User";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -143,6 +146,10 @@ const App = () => {
           isDeleteAllowed={blog.user?.username === user?.username}
         />
       ))}
+      <Routes>
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<User />} />
+      </Routes>
     </div>
   );
 };
