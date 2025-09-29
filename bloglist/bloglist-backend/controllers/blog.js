@@ -37,7 +37,7 @@ blogRouter.delete(
     if (!blog)
       return response.status(404).json({ error: "Blog does not exist" });
 
-    user.blogs = user.blogs.filter((item) => item !== id);
+    user.blogs = user.blogs.filter((item) => item.toString() !== id);
     await user.save();
 
     return response.status(204).send();

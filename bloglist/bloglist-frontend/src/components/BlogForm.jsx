@@ -11,7 +11,7 @@ const baseBlogState = {
   author: "",
 };
 
-const BlogForm = () => {
+const BlogForm = ({ closeToggle }) => {
   const dispatch = useDispatch();
   const [blog, setBlog] = useState(baseBlogState);
 
@@ -36,6 +36,8 @@ const BlogForm = () => {
     try {
       const returnedBlog = await blogService.create(blog);
       dispatch(createBlog(returnedBlog));
+      setBlog(baseBlogState);
+      closeToggle();
     } catch (err) {
       handleError(err);
     }

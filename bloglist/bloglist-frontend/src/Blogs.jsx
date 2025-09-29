@@ -18,10 +18,12 @@ const Blogs = () => {
     blogService.getAll().then((blogs) => dispatch(setBlogs(blogs)));
   }, []);
 
+  const closeToggle = () => blogFormRef.current?.toggleVisibility();
+
   return (
     <div>
       <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
-        <BlogForm />
+        <BlogForm closeToggle={closeToggle} />
       </Togglable>
       <br />
       {blogs.map((blog) => (
