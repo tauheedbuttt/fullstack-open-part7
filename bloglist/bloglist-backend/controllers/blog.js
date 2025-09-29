@@ -3,14 +3,21 @@ const {
   Types: { ObjectId },
 } = require("mongoose");
 const Blog = require("../models/blog");
+const Comment = require("../models/comment");
 const { tokenExtractor, userExtractor } = require("../utils/middleware");
 
 blogRouter.get("/:id", async (request, response) => {
   const { id } = request.params;
-  const blog = await Blog.findById(id).populate("user", {
-    username: 1,
-    name: 1,
-  });
+  const blog = await Blog.findById(id).populate([
+    {
+      path: "user",
+      select: "username name",
+    },
+    {
+      path: "comments",
+      select: "id description",
+    },
+  ]);
   if (blog) return response.json(blog);
   else return response.status(404).json({ error: "Blog not found." });
 });
@@ -49,7 +56,16 @@ blogRouter.put("/:id", async (request, response) => {
     id,
     { title, author, url, likes },
     { new: true }
-  ).populate("user", "id username name");
+  ).populate([
+    {
+      path: "user",
+      select: "username name",
+    },
+    {
+      path: "comments",
+      select: "id description",
+    },
+  ]);
 
   if (!blog) return response.status(404).send();
 
@@ -81,5 +97,36 @@ blogRouter.post(
     response.status(201).json(result);
   }
 );
+
+blogRouter.post("/:id/comment", async (request, response) => {
+  const { id } = request.params;
+
+  if (!request.body)
+    return response.status(400).json({ error: "Comment data is required" });
+
+  const { description } = request.body;
+
+  const blog = await Blog.findById(id);
+  if (!blog) return response.status(404).json({ error: "Blog not found" });
+
+  const comment = new Comment({ description, blog: blog._id });
+  const savedComment = await comment.save();
+
+  blog.comments = blog.comments.concat(savedComment._id);
+  await blog.save();
+
+  const populatedBlog = await blog.populate([
+    {
+      path: "user",
+      select: "username name",
+    },
+    {
+      path: "comments",
+      select: "id description",
+    },
+  ]);
+
+  return response.status(200).json(populatedBlog);
+});
 
 module.exports = blogRouter;

@@ -5,6 +5,7 @@ import { setNotification } from "../reducers/notificationReducer";
 import { logoutUser } from "../reducers/userReducer";
 import blogService from "../services/blogs";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Comment from "./Comment";
 
 const Blog = () => {
   const dispatch = useDispatch();
@@ -80,10 +81,18 @@ const Blog = () => {
         {blog.likes} likes
         <button onClick={handleLikeBlog}>Like</button> <br />
       </div>
-      <div>added by {user.name}</div>
+      <div>added by {blog.user.name}</div>
       {isDeleteAllowed && (
         <button onClick={() => handleDeleteBlog(blog)}>Delete</button>
       )}
+
+      <h4>comments</h4>
+      <Comment blogId={blog.id} handleError={handleError} />
+      <ul>
+        {blog.comments.map((comment) => (
+          <li key={comment.id}>{comment.description}</li>
+        ))}
+      </ul>
     </div>
   );
 };

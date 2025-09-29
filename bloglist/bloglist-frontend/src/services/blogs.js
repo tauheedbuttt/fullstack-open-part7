@@ -39,4 +39,18 @@ const getOne = (id) => {
   const request = axios.get(`${baseUrl}/${id}`);
   return request.then((response) => response.data);
 };
-export default { getAll, create, setToken, update, deleteBlog, getOne };
+
+const addComment = ({ blogId, description }) => {
+  const request = axios.post(`${baseUrl}/${blogId}/comment`, { description });
+  return request.then((response) => response.data);
+};
+
+export default {
+  getAll,
+  create,
+  setToken,
+  update,
+  deleteBlog,
+  getOne,
+  addComment,
+};
