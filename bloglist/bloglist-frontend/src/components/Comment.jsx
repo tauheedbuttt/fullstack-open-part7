@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import blogService from "../services/blogs";
+import { Form } from "react-bootstrap";
 
 const Comment = ({ blogId, handleError }) => {
   const queryClient = useQueryClient();
@@ -22,14 +23,23 @@ const Comment = ({ blogId, handleError }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        <input name="description" type="text" />
-        <button disabled={isPending} type="submit">
-          add comment
-        </button>
-      </label>
-    </form>
+    <Form onSubmit={handleSubmit} className="d-flex align-items-center gap-3">
+      <Form.Group className="w-100">
+        <Form.Control
+          name="description"
+          type="text"
+          placeholder="Add a comment"
+        />
+      </Form.Group>
+      <button
+        disabled={isPending}
+        type="submit"
+        className="btn btn-primary"
+        style={{ whiteSpace: "nowrap" }}
+      >
+        add comment
+      </button>
+    </Form>
   );
 };
 

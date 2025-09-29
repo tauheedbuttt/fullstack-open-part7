@@ -1,3 +1,4 @@
+import { Alert } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
 const Notification = () => {
@@ -7,7 +8,17 @@ const Notification = () => {
     return null;
   }
 
-  return <div className={notification.variant}>{notification.message}</div>;
+  return (
+    <div className="container">
+      <Alert
+        variant={
+          notification.variant === "error" ? "danger" : notification.variant
+        }
+      >
+        {notification.message}
+      </Alert>
+    </div>
+  );
 };
 
 export default Notification;

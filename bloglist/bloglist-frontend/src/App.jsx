@@ -9,10 +9,9 @@ import Navigation from "./components/Navigation";
 
 const App = () => {
   return (
-    <div>
-      <h2>BLOGS</h2>
-      <Notification />
+    <div className="container mt-5 mb-5">
       <Navigation />
+      <Notification />
       <Login />
       <Routes>
         <Route path="/blogs" element={<Blogs />} />

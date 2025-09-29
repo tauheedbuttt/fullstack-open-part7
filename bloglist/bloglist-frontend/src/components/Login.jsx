@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LoginForm from "./LoginForm";
-import Togglable from "./Togglable";
 import { setNotification } from "../reducers/notificationReducer";
 import {
   initializeUser,
   localStorageKey,
   loginUser,
-  logoutUser,
 } from "../reducers/userReducer";
 import loginService from "../services/login";
+import LoginForm from "./LoginForm";
+import Togglable from "./Togglable";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -36,8 +35,6 @@ const Login = () => {
     }
   };
 
-  const handleLogout = () => dispatch(logoutUser(null));
-
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem(localStorageKey);
     if (loggedUserJSON) {
@@ -58,15 +55,6 @@ const Login = () => {
             handleSubmit={handleLogin}
           />
         </Togglable>
-      )}
-      {user && (
-        <div>
-          {" "}
-          <p>
-            {user.name} logged in{" "}
-            <button onClick={handleLogout}>Log out </button>
-          </p>{" "}
-        </div>
       )}
     </div>
   );

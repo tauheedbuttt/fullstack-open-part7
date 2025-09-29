@@ -4,6 +4,7 @@ import { createBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
 import { logoutUser } from "../reducers/userReducer";
 import { useDispatch } from "react-redux";
+import { Form } from "react-bootstrap";
 
 const baseBlogState = {
   title: "",
@@ -51,39 +52,38 @@ const BlogForm = ({ closeToggle }) => {
     <div>
       <h2>Create a new blog</h2>
 
-      <form onSubmit={onSubmit}>
-        <label>
-          Title:
-          <input
+      <Form onSubmit={onSubmit}>
+        <Form.Group className="mb-2">
+          <Form.Label>Title:</Form.Label>
+          <Form.Control
             placeholder="title"
             name="title"
             value={blog.title}
             onChange={handleChange}
           />
-        </label>
-        <br />
-        <label>
-          Author:
-          <input
+        </Form.Group>
+        <Form.Group className="mb-2">
+          <Form.Label>Author:</Form.Label>
+          <Form.Control
             placeholder="author"
             name="author"
             value={blog.author}
             onChange={handleChange}
           />
-        </label>
-        <br />
-        <label>
-          URL:
-          <input
+        </Form.Group>
+        <Form.Group className="mb-2">
+          <Form.Label>URL:</Form.Label>
+          <Form.Control
             placeholder="url"
             name="url"
             value={blog.url}
             onChange={handleChange}
           />
-        </label>
-        <br />
-        <button type="submit">save</button>
-      </form>
+        </Form.Group>
+        <button type="submit" className="btn btn-primary mt-2">
+          save
+        </button>
+      </Form>
     </div>
   );
 };

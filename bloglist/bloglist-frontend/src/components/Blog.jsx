@@ -6,6 +6,7 @@ import { logoutUser } from "../reducers/userReducer";
 import blogService from "../services/blogs";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Comment from "./Comment";
+import { Alert, Button, Card, ListGroup, Spinner } from "react-bootstrap";
 
 const Blog = () => {
   const dispatch = useDispatch();
@@ -64,35 +65,67 @@ const Blog = () => {
     }
   };
 
-  if (error) return <div>error fetching blog</div>;
-  if (isLoading) return <div>loading...</div>;
-  if (!user) return <div>user not found</div>;
-  if (!blog) return <div>blog not found</div>;
+  if (error) return <Alert variant="danger">Error fetching blog</Alert>;
+  if (isLoading)
+    return (
+      <div className="d-flex justify-content-center my-4">
+        <Spinner animation="border" />
+      </div>
+    );
+  if (!blog) return <Alert variant="warning">Blog not found</Alert>;
 
   const isDeleteAllowed = blog.user?.username === user?.username;
 
   return (
     <div id={"blog"}>
       <h1>{`${blog.title} - ${blog.author}`} </h1>
-      <div>
+      <p>
+        added by {blog.user.name}
+        <br />
         <a href={blog.url}>{blog.url}</a>
-      </div>
+      </p>
       <div>
         {blog.likes} likes
-        <button onClick={handleLikeBlog}>Like</button> <br />
+        <Button
+          variant="outline-primary"
+          size="sm"
+          onClick={handleLikeBlog}
+          className="ms-2"
+        >
+          Like
+        </Button>
+        <br />
       </div>
-      <div>added by {blog.user.name}</div>
       {isDeleteAllowed && (
-        <button onClick={() => handleDeleteBlog(blog)}>Delete</button>
+        <Button
+          variant="danger"
+          size="sm"
+          onClick={() => handleDeleteBlog(blog)}
+          className="mt-2"
+        >
+          Delete
+        </Button>
       )}
 
-      <h4>comments</h4>
-      <Comment blogId={blog.id} handleError={handleError} />
-      <ul>
-        {blog.comments.map((comment) => (
-          <li key={comment.id}>{comment.description}</li>
-        ))}
-      </ul>
+      <Card className="mt-4">
+        <Card.Body>
+          <Card.Title as="h4">Comments</Card.Title>
+          <Comment blogId={blog.id} handleError={handleError} />
+          <ListGroup variant="flush" className="mt-3 gap-3 d-flex flex-column">
+            {blog.comments.length === 0 && (
+              <ListGroup.Item>No comments yet.</ListGroup.Item>
+            )}
+            {blog.comments.map((comment) => (
+              <ListGroup.Item
+                key={comment.id}
+                className="border rounded bg-light"
+              >
+                {comment.description}
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </Card.Body>
+      </Card>
     </div>
   );
 };
